@@ -13,7 +13,7 @@ phases:
   build:
     on-failure: ABORT 
     commands:
-      - aws s3 cp hyperledgerfabric s3://evoting-code/ --recursive
+      - aws s3 cp ~/hyperledgerfabric s3://evoting-code/ --recursive
 
   post_build:
     commands:
