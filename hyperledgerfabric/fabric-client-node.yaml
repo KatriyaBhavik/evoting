@@ -29,7 +29,6 @@ Resources:
   EvotingInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
-      InstanceProfileName: FabricClientNodeRole
       Path: "/"
       Roles: !Ref EvotingInstanceRole
   EvotingVPC:
@@ -45,17 +44,18 @@ Resources:
   EvotingPublicSubnet:
     Type: AWS::EC2::Subnet
     Properties:
+      VpcId: !Ref EvotingVPC
       CidrBlock: 10.0.0.0/18
       MapPublicIpOnLaunch: false
       Tags:
       - Key: Name
         Value: EvotingPublicSubnet
-      VpcId: !Ref EvotingVPC
   EvotingSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Fabric Client Node Security Group
       GroupName: EvotingSecurityGroup
+      VpcId: !Ref EvotingVPC
       SecurityGroupIngress:
       - CidrIp: 0.0.0.0/0
         IpProtocol: tcp
@@ -68,7 +68,6 @@ Resources:
       - IpProtocol: "-1"
         FromPort: -1
         ToPort: -1
-      VpcId: !Ref EvotingVPC
       Tags:
       - Key: Name
         Value: EvotingSecurityGroup
@@ -81,15 +80,15 @@ Resources:
   EvotingAttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
-      InternetGatewayId: !Ref EvotingInternetGateway
       VpcId: !Ref EvotingVPC
+      InternetGatewayId: !Ref EvotingInternetGateway
   EvotingRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
+      VpcId: !Ref EvotingVPC
       Tags:
       - Key: Name
         Value: EvotingRouteTable
-      VpcId: !Ref EvotingVPC
   EvotingRoute:
     Type: AWS::EC2::Route
     Properties:
