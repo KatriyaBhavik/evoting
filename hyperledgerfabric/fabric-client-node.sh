@@ -27,7 +27,7 @@ if [ $? - gt 0 ]; then
     exit $?
 fi
 
-chmod 400 ~/$NETWORKNAME-keypair.pem
+chmod 400 ~/$NETWORKNAME-keypair
 sleep 5
 
 echo create VPC, VPC Endpoint and Favric client node

@@ -105,11 +105,9 @@ Resources:
     Type: AWS::EC2::VPCEndpoint
     Properties:
       PrivateDnsEnabled: true
-      SecurityGroupIds:
-      - Ref: EvotingSecurityGroup
+      SecurityGroupIds: !Ref EvotingSecurityGroup
       ServiceName: !Ref EvotingVpcServiceEndpointName
-      SubnetIds:
-      - Ref: EvotingPublicSubnet
+      SubnetIds: !Ref EvotingPublicSubnet
       VpcEndpointType: Interface
       VpcId: !Ref EvotingVPC
   EvotingEC2:
@@ -124,8 +122,7 @@ Resources:
         AssociatePublicIpAddress: true
         Description: 'Evoting VPC '
         DeviceIndex: '0'
-        GroupSet:
-        - Ref: EvotingSecurityGroup
+        GroupSet: !Ref EvotingSecurityGroup
         SubnetId:
           Ref: EvotingPublicSubnet
       Tags:
