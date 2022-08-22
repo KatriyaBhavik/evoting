@@ -1,0 +1,129 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+  EvotingVpcServiceEndpointName:
+    Type: String
+Resources:
+  EvotingInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: root
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action: "*"
+            Resource: "*"
+  EvotingInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles: !Ref EvotingInstanceRole
+  EvotingVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: default
+      Tags:
+      - Key: Name
+        Value: EvotingVPC
+  EvotingPublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref EvotingVPC
+      CidrBlock: 10.0.0.0/18
+      MapPublicIpOnLaunch: false
+      Tags:
+      - Key: Name
+        Value: EvotingPublicSubnet
+  EvotingSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Fabric Client Node Security Group
+      GroupName: EvotingSecurityGroup
+      VpcId: !Ref EvotingVPC
+      SecurityGroupIngress:
+      - CidrIp: 0.0.0.0/0
+        IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+      - CidrIp: 0.0.0.0/0
+        IpProtocol: tcp
+        FromPort: 0
+        ToPort: 65535
+      - IpProtocol: "-1"
+        FromPort: -1
+        ToPort: -1
+      Tags:
+      - Key: Name
+        Value: EvotingSecurityGroup
+  EvotingInternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+      - Key: Name
+        Value: EvotingInternetGateway
+  EvotingAttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref EvotingVPC
+      InternetGatewayId: !Ref EvotingInternetGateway
+  EvotingRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref EvotingVPC
+      Tags:
+      - Key: Name
+        Value: EvotingRouteTable
+  EvotingRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref EvotingRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref EvotingInternetGateway
+  EvotingSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref EvotingRouteTable
+      SubnetId: !Ref EvotingPublicSubnet
+  Evoting:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PrivateDnsEnabled: true
+      SecurityGroupIds: !Ref EvotingSecurityGroup
+      ServiceName: !Ref EvotingVpcServiceEndpointName
+      SubnetIds: !Ref EvotingPublicSubnet
+      VpcEndpointType: Interface
+      VpcId: !Ref EvotingVPC
+  EvotingEC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: us-east-1
+      IamInstanceProfile: !Ref EvotingInstanceProfile
+      ImageId: ami-0434d5878c6ad6d4c
+      InstanceType: t2.medium
+      KeyName: !Ref KeyName
+      NetworkInterfaces:
+        AssociatePublicIpAddress: true
+        Description: 'Evoting VPC '
+        DeviceIndex: '0'
+        GroupSet: !Ref EvotingSecurityGroup
+        SubnetId:
+          Ref: EvotingPublicSubnet
+      Tags:
+      - Key: Name
+        Value: EvotingEC2Clientinstance

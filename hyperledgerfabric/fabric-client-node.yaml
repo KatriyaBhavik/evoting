@@ -1,129 +1,207 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion:                         '2010-09-09'
+Description:                                      >
+  Fabric Client node
 Parameters:
   KeyName:
-    Type: AWS::EC2::KeyPair::KeyName
+    Type:                                         AWS::EC2::KeyPair::KeyName
+    Description:                                  Name of an existing EC2 key pair to enable SSH access to the EC2 instance
   EvotingVpcServiceEndpointName:
-    Type: String
+    Type:                                         String
+    Description:                                  Name of the Blockchain VPC Endpoint. Obtained from running 'aws managedblockchain get-network'
+ 
 Resources:
-  EvotingInstanceRole:
-    Type: AWS::IAM::Role
+  EvotingRootRole:
+    Type:                                         "AWS::IAM::Role"
     Properties:
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version:                                  "2012-10-17"
         Statement:
-        - Effect: Allow
-          Principal:
-            Service:
-            - ec2.amazonaws.com
-          Action:
-          - sts:AssumeRole
-      Path: "/"
+          -
+            Effect:                               "Allow"
+            Principal:
+              Service:
+                -                                 "ec2.amazonaws.com"
+            Action:
+              -                                   "sts:AssumeRole"
+      Path:                                       "/"
+      MaxSessionDuration:                         10800
       Policies:
-      - PolicyName: root
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Effect: Allow
-            Action: "*"
-            Resource: "*"
-  EvotingInstanceProfile:
-    Type: AWS::IAM::InstanceProfile
+        -
+          PolicyName:                             "root"
+          PolicyDocument:
+            Version:                              "2012-10-17"
+            Statement:
+              -
+                Effect:                           "Allow"
+                Action:                           "*"
+                Resource:                         "*"
+ 
+  EvotingRootInstanceProfile:
+    Type:                                         "AWS::IAM::InstanceProfile"
     Properties:
-      Path: "/"
-      Roles: !Ref EvotingInstanceRole
+      Path:                                       "/"
+      Roles:
+        -
+          Ref:                                    "EvotingRootRole"
+ 
   EvotingVPC:
-    Type: AWS::EC2::VPC
+    Type:                                         AWS::EC2::VPC
     Properties:
-      CidrBlock: 10.0.0.0/16
-      EnableDnsHostnames: true
-      EnableDnsSupport: true
-      InstanceTenancy: default
+      CidrBlock:                                  10.0.0.0/16
+      EnableDnsSupport:                           True
+      EnableDnsHostnames:                         True
+      InstanceTenancy:                            default
       Tags:
-      - Key: Name
-        Value: EvotingVPC
+        - Key:                                    Evoting
+          Value:                                  VPC
+ 
   EvotingPublicSubnet:
-    Type: AWS::EC2::Subnet
+    Type:                                         AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref EvotingVPC
-      CidrBlock: 10.0.0.0/18
-      MapPublicIpOnLaunch: false
-      Tags:
-      - Key: Name
-        Value: EvotingPublicSubnet
+        VpcId:                                    !Ref EvotingVPC
+        MapPublicIpOnLaunch:                      false
+        CidrBlock:                                10.0.0.0/18
+        Tags:
+        - Key:                                    Evoting
+          Value:                                  PublicSubnet
+ 
   EvotingSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+        Type:                                     AWS::EC2::SecurityGroup
+        Properties:
+          GroupDescription:                       Fabric Client Node Security Group
+          VpcId:                                  !Ref EvotingVPC
+          SecurityGroupIngress:
+          - IpProtocol:                           tcp
+            CidrIp:                               0.0.0.0/0
+            FromPort:                             22
+            ToPort:                               22
+          - IpProtocol:                           tcp
+            CidrIp:                               0.0.0.0/0
+            FromPort:                             0
+            ToPort:                               65535
+          Tags:
+          - Key:                                  Evoting
+            Value:                                FabricClientNodeSecurityGroup
+ 
+  EvotingSecurityGroupIngress:
+    Type:                                         AWS::EC2::SecurityGroupIngress
     Properties:
-      GroupDescription: Fabric Client Node Security Group
-      GroupName: EvotingSecurityGroup
-      VpcId: !Ref EvotingVPC
-      SecurityGroupIngress:
-      - CidrIp: 0.0.0.0/0
-        IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-      - CidrIp: 0.0.0.0/0
-        IpProtocol: tcp
-        FromPort: 0
-        ToPort: 65535
-      - IpProtocol: "-1"
-        FromPort: -1
-        ToPort: -1
+      IpProtocol:                                 -1
+      FromPort:                                   -1
+      GroupId:                                    !GetAtt EvotingSecurityGroup.GroupId
+      ToPort:                                     -1
+      SourceSecurityGroupId:                      !GetAtt EvotingSecurityGroup.GroupId
       Tags:
-      - Key: Name
-        Value: EvotingSecurityGroup
+      - Key:                                      Evoting
+        Value:                                    BaseSecurityGroupIngress
+ 
   EvotingInternetGateway:
-    Type: AWS::EC2::InternetGateway
+    Type:                                         "AWS::EC2::InternetGateway"
     Properties:
       Tags:
-      - Key: Name
-        Value: EvotingInternetGateway
+      - Key:                                      Evoting
+        Value:                                    InternetGateway
+ 
   EvotingAttachGateway:
-    Type: AWS::EC2::VPCGatewayAttachment
+    Type:                                         AWS::EC2::VPCGatewayAttachment
     Properties:
-      VpcId: !Ref EvotingVPC
-      InternetGatewayId: !Ref EvotingInternetGateway
+       VpcId:                                     !Ref EvotingVPC
+       InternetGatewayId:                         !Ref EvotingInternetGateway
+ 
   EvotingRouteTable:
-    Type: AWS::EC2::RouteTable
+    Type:                                         AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref EvotingVPC
-      Tags:
-      - Key: Name
-        Value: EvotingRouteTable
+        VpcId:                                    !Ref EvotingVPC
+        Tags:
+          - Key:                                  Evoting
+            Value:                                RouteTable
+ 
   EvotingRoute:
-    Type: AWS::EC2::Route
+    Type:                                         AWS::EC2::Route
     Properties:
-      DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref EvotingInternetGateway
-      RouteTableId: !Ref EvotingRouteTable
+        RouteTableId:                             !Ref EvotingRouteTable
+        DestinationCidrBlock:                     0.0.0.0/0
+        GatewayId:                                !Ref EvotingInternetGateway
+ 
   EvotingSubnetRouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
+    Type:                                         AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref EvotingRouteTable
-      SubnetId: !Ref EvotingPublicSubnet
-  Evoting:
-    Type: AWS::EC2::VPCEndpoint
+        SubnetId:                                 !Ref EvotingPublicSubnet
+        RouteTableId:                             !Ref EvotingRouteTable
+ 
+  EvotingVPCEndpoint:
+    Type:                                         AWS::EC2::VPCEndpoint
     Properties:
-      PrivateDnsEnabled: true
-      SecurityGroupIds: !Ref EvotingSecurityGroup
-      ServiceName: !Ref EvotingVpcServiceEndpointName
-      SubnetIds: !Ref EvotingPublicSubnet
-      VpcEndpointType: Interface
-      VpcId: !Ref EvotingVPC
+        VpcId:                                    !Ref EvotingVPC
+        PrivateDnsEnabled:                        True
+        ServiceName:                              !Ref EvotingVpcServiceEndpointName
+        VpcEndpointType:                          Interface
+        SubnetIds:                                [!Ref EvotingPublicSubnet]
+        SecurityGroupIds:                         [!Ref EvotingSecurityGroup]
+ 
   EvotingEC2:
-    Type: AWS::EC2::Instance
+    Type:                                         AWS::EC2::Instance
     Properties:
-      AvailabilityZone: us-east-1
-      IamInstanceProfile: !Ref EvotingInstanceProfile
-      ImageId: ami-0434d5878c6ad6d4c
-      InstanceType: t2.medium
-      KeyName: !Ref KeyName
-      NetworkInterfaces:
-        AssociatePublicIpAddress: true
-        Description: 'Evoting VPC '
-        DeviceIndex: '0'
-        GroupSet: !Ref EvotingSecurityGroup
-        SubnetId:
-          Ref: EvotingPublicSubnet
+        KeyName:                                  !Ref KeyName
+        ImageId:                                  'ami-0434d5878c6ad6d4c'
+        InstanceType:                             't2.medium'
+        IamInstanceProfile:                       !Ref EvotingRootInstanceProfile
+        NetworkInterfaces:
+        - AssociatePublicIpAddress:               true
+          DeviceIndex:                            0
+          GroupSet:                               [!Ref EvotingSecurityGroup]
+          SubnetId:                               !Ref EvotingPublicSubnet
+        Tags:
+          - Key:                                  Name
+            Value:                                ManagedEvotingEC2ClientInstance
+ 
+  EvotingELB:
+    Type:                                         AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      SecurityGroups:                             [!Ref EvotingSecurityGroup]
+      Subnets:                                    [!Ref EvotingPublicSubnet]
+      Instances:
+        - !Ref                                    EvotingEC2
+      Listeners:
+        - LoadBalancerPort:                       '80'
+          InstancePort:                           '3000'
+          Protocol:                               TCP
+      HealthCheck:
+        Target:                                   HTTP:3000/health
+        HealthyThreshold:                         '3'
+        UnhealthyThreshold:                       '5'
+        Interval:                                 '10'
+        Timeout:                                  '5'
       Tags:
-      - Key: Name
-        Value: EvotingEC2Clientinstance
+        - Key:                                    Name
+          Value:                                  EvotingELB
+ 
+Outputs:
+  VPCID:
+    Description:                                  VPC ID
+    Value:
+      !Ref                                        EvotingVPC
+  PublicSubnetID:
+    Description:                                  Public Subnet ID
+    Value:
+      !Ref                                        EvotingPublicSubnet
+  SecurityGroupID:
+    Description:                                  Security Group ID
+    Value:
+      !GetAtt                                     EvotingSecurityGroup.GroupId
+  EC2URL:
+    Description:                                  Public DNS of the EC2 Fabric client node instance
+    Value:
+      !GetAtt                                     EvotingEC2.PublicDnsName
+  EC2ID:
+    Description:                                  Instance ID of the EC2 Fabric client node instance
+    Value:
+      !Ref                                        EvotingEC2
+  ELBDNS:
+    Description:                                  Public DNS of the ELB
+    Value:
+      !GetAtt                                     EvotingELB.DNSName
+  EvotingVpcServiceEndpointName:
+    Description:                                  VPC Endpoint ID
+    Value:
+      !Ref                                        EvotingVPCEndpoint
