@@ -33,5 +33,5 @@ sleep 5
 echo create VPC, VPC Endpoint and Favric client node
 aws cloudformation deploy --stack-name $NETWORKNAME-fabric-client-node --template-file fabric-client-node.yaml \
 --capabilities CAPABILITY_NAMED_IAM \
---parameter-overrides KeyName=$NETWORKNAME-keypair BlockchainVpcEndpointServiceName=$VPCENDPOINTSERVICENAME \
+--parameter-overrides KeyName=$NETWORKNAME-keypair EvotingVpcServiceEndpointName=$VPCENDPOINTSERVICENAME \
 --region $REGION
