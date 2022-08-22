@@ -1,0 +1,20 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo install started on `date`
+
+  pre_build:
+    on-failure: ABORT 
+    commands:
+      - echo source version - $CODEBUILD_RESOLVED_SOURCE_VERSION
+
+  build:
+    on-failure: ABORT 
+    commands:
+      - aws s3 cp hyperledgerfabric s3://evoting-code/ --recursive
+
+  post_build:
+    commands:
+      - echo Post Build started on `date`
