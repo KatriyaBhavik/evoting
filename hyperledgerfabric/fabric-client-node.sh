@@ -5,13 +5,10 @@ echo Creating keypair
 echo $STACKNAME
 NETWORKNAME=$(aws cloudformation describe-stacks --stack-name $STACKNAME --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`NetworkName`].OutputValue' --output text)
 echo $NETWORKNAME
-export NETWORKNAME=$NETWORKNAME
 NETWORKID=$(aws cloudformation describe-stacks --stack-name $STACKNAME --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`NetworkId`].OutputValue' --output text)
 echo $NETWORKID
-export NETWORKID=$NETWORKID
 VPCENDPOINTSERVICENAME=$(aws managedblockchain get-network --region $REGION --network-id $NETWORKID --query 'Network.VpcEndpointServiceName' --output text)
 echo $VPCENDPOINTSERVICENAME
-export VPCENDPOINTSERVICENAME=$VPCENDPOINTSERVICENAME
 
 echo Searching for existing keypair named $NETWORKNAME-keypair
 keyname=$(aws ec2 describe-key-pairs --key-names $NETWORKNAME-keypair --region $REGION --query 'KeyPairs[0].KeyName' --output text)
@@ -21,13 +18,13 @@ if [["$keyname" == "$NETWORKNAME-keypair"]]; then
 fi 
 
 echo Creating $NETWORKNAME-keypair
-aws ec2 create-key-pair --key-name $NETWORKNAME-keypair --query 'KeyMaterial' --region $REGION --output text > ~/$NETWORKNAME-keypair
+aws ec2 create-key-pair --key-name $NETWORKNAME-keypair --query 'KeyMaterial' --region $REGION --output text > ~/$NETWORKNAME-keypair.pem
 if [ $? - gt 0 ]; then  
     echo could not create $NETWORKNAME-keypair
     exit $?
 fi
 
-chmod 400 ~/$NETWORKNAME-keypair
+chmod 400 ~/$NETWORKNAME-keypair.pem
 sleep 5
 
 echo create VPC, VPC Endpoint and Favric client node
