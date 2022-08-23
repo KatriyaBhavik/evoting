@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Description: evoting hyperledger fabric network
 Parameters:
   NetworkName:
     Description: The name of your Amazon Managed Blockchain network.
