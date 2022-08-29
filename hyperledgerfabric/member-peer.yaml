@@ -129,7 +129,25 @@ Resources:
           MemberFabricConfiguration:
             AdminUsername: !Ref MemberAdminUsername
             AdminPassword: !Ref MemberAdminPassword
-  EvotingPeernode:
+  EvotingPeernode1:
+    Type: "AWS::ManagedBlockchain::Node"
+    Properties:
+      MemberId: !GetAtt EvotingMember.MemberId
+      NetworkId: !GetAtt EvotingMember.NetworkId
+      NodeConfiguration:
+        AvailabilityZone: !Ref PeerNodeAvailabilityZone
+        InstanceType: !Ref PeerNodeInstanceType
+    DependsOn: EvotingMember
+  EvotingPeernode2:
+    Type: "AWS::ManagedBlockchain::Node"
+    Properties:
+      MemberId: !GetAtt EvotingMember.MemberId
+      NetworkId: !GetAtt EvotingMember.NetworkId
+      NodeConfiguration:
+        AvailabilityZone: !Ref PeerNodeAvailabilityZone
+        InstanceType: !Ref PeerNodeInstanceType
+    DependsOn: EvotingMember
+  EvotingPeernode3:
     Type: "AWS::ManagedBlockchain::Node"
     Properties:
       MemberId: !GetAtt EvotingMember.MemberId
@@ -169,11 +187,21 @@ Outputs:
     Value: !Ref FrameworkVersion
     Export:
       Name: !Sub "${NetworkName}-FrameworkVersion"
-  MemberPeerNodeId:
+  MemberPeerNode1Id:
     Description: member peer node Id
-    Value: !GetAtt EvotingPeernode.NodeId
+    Value: !GetAtt EvotingPeernode1.NodeId
     Export:
-      Name: !Sub "${NetworkName}-MemberPeerNodeId"
+      Name: !Sub "${NetworkName}-MemberPeerNode1Id"
+  MemberPeerNode2Id:
+    Description: member peer node Id
+    Value: !GetAtt EvotingPeernode2.NodeId
+    Export:
+      Name: !Sub "${NetworkName}-MemberPeerNode2Id"
+  MemberPeerNode3Id:
+    Description: member peer node Id
+    Value: !GetAtt EvotingPeernode3.NodeId
+    Export:
+      Name: !Sub "${NetworkName}-MemberPeerNode3Id"
   MemberAdminUsername:
     Description: fabric admin user name
     Value: !Ref MemberAdminUsername
