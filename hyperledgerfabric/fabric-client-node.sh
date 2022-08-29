@@ -1,7 +1,7 @@
 echo Creating EC2 Client node, Security Group VPC, subnet, VPC endpoint
 echo Creating keypair
 
-#STACKNAME=$(aws cloudformation describe-stacks --region $REGION --query 'Stacks[?Description==`evoting hyperledger fabric network`] | [0].StackName' --output text)
+STACKNAME=$(aws cloudformation describe-stacks --region $REGION --query 'Stacks[?Description==`evoting hyperledger fabric network`] | [0].StackName' --output text)
 echo $STACKNAME
 NETWORKNAME=$(aws cloudformation describe-stacks --stack-name $STACKNAME --region $REGION --query 'Stacks[0].Outputs[?OutputKey==`NetworkName`].OutputValue' --output text)
 echo $NETWORKNAME
