@@ -31,30 +31,30 @@ VpcEndpointServiceName=$(aws managedblockchain get-network --region $REGION --ne
 OrderingServiceEndpoint=$(aws managedblockchain get-network --region $REGION --network-id $NETWORKID --query 'Network.FrameworkAttributes.Fabric.OrderingServiceEndpoint' --output text)
 CaEndpoint=$(aws managedblockchain get-member --region $REGION --network-id $NETWORKID --member-id $MEMBERID --query 'Member.FrameworkAttributes.Fabric.CaEndpoint' --output text)
 nodeID1=$(aws managedblockchain list-nodes --region $REGION --network-id $NETWORKID --member-id $MEMBERID --query 'Nodes[?Status==`AVAILABLE`] | [0].Id' --output text)
-nodeID2=$(aws managedblockchain list-nodes --region $REGION --network-id $NETWORKID --member-id $MEMBERID --query 'Nodes[?Status==`AVAILABLE`] | [1].Id' --output text)
-nodeID3=$(aws managedblockchain list-nodes --region $REGION --network-id $NETWORKID --member-id $MEMBERID --query 'Nodes[?Status==`AVAILABLE`] | [2].Id' --output text)
+#nodeID2=$(aws managedblockchain list-nodes --region $REGION --network-id $NETWORKID --member-id $MEMBERID --query 'Nodes[?Status==`AVAILABLE`] | [1].Id' --output text)
+#nodeID3=$(aws managedblockchain list-nodes --region $REGION --network-id $NETWORKID --member-id $MEMBERID --query 'Nodes[?Status==`AVAILABLE`] | [2].Id' --output text)
 peerEndpoint1=$(aws managedblockchain get-node --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID1 --query 'Node.FrameworkAttributes.Fabric.PeerEndpoint' --output text)
-peerEndpoint2=$(aws managedblockchain get-node --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID2 --query 'Node.FrameworkAttributes.Fabric.PeerEndpoint' --output text)
-peerEndpoint3=$(aws managedblockchain get-node --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID3 --query 'Node.FrameworkAttributes.Fabric.PeerEndpoint' --output text)
+#peerEndpoint2=$(aws managedblockchain get-node --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID2 --query 'Node.FrameworkAttributes.Fabric.PeerEndpoint' --output text)
+#peerEndpoint3=$(aws managedblockchain get-node --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID3 --query 'Node.FrameworkAttributes.Fabric.PeerEndpoint' --output text)
 peerEventEndpoint1=$(aws managedblockchain get-node --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID1 --query 'Node.FrameworkAttributes.Fabric.PeerEventEndpoint' --output text)
-peerEventEndpoint2=$(aws managedblockchain get-node --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID2 --query 'Node.FrameworkAttributes.Fabric.PeerEventEndpoint' --output text)
-peerEventEndpoint3=$(aws managedblockchain get-node --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID3 --query 'Node.FrameworkAttributes.Fabric.PeerEventEndpoint' --output text)
+#peerEventEndpoint2=$(aws managedblockchain get-node --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID2 --query 'Node.FrameworkAttributes.Fabric.PeerEventEndpoint' --output text)
+#peerEventEndpoint3=$(aws managedblockchain get-node --region $REGION --network-id $NETWORKID --member-id $MEMBERID --node-id $nodeID3 --query 'Node.FrameworkAttributes.Fabric.PeerEventEndpoint' --output text)
 export ORDERINGSERVICEENDPOINT=$OrderingServiceEndpoint
 export ORDERINGSERVICEENDPOINTNOPORT=${ORDERINGSERVICEENDPOINT::-6}
 export VPCENDPOINTSERVICENAME=$VpcEndpointServiceName
 export CASERVICEENDPOINT=$CaEndpoint
 export PEERNODEID1=$nodeID1
-export PEERNODEID2=$nodeID2
-export PEERNODEID3=$nodeID3
+#export PEERNODEID2=$nodeID2
+#export PEERNODEID3=$nodeID3
 export PEERSERVICEENDPOINT1=$peerEndpoint1
-export PEERSERVICEENDPOINT2=$peerEndpoint2
-export PEERSERVICEENDPOINT3=$peerEndpoint3
+#export PEERSERVICEENDPOINT2=$peerEndpoint2
+#export PEERSERVICEENDPOINT3=$peerEndpoint3
 export PEERSERVICEENDPOINTNOPORT1=${PEERSERVICEENDPOINT1::-6}
-export PEERSERVICEENDPOINTNOPORT2=${PEERSERVICEENDPOINT2::-6}
-export PEERSERVICEENDPOINTNOPORT3=${PEERSERVICEENDPOINT3::-6}
+#export PEERSERVICEENDPOINTNOPORT2=${PEERSERVICEENDPOINT2::-6}
+#export PEERSERVICEENDPOINTNOPORT3=${PEERSERVICEENDPOINT3::-6}
 export PEEREVENTENDPOINT1=$peerEventEndpoint1
-export PEEREVENTENDPOINT2=$PEEREVENTENDPOINT2
-export PEEREVENTENDPOINT3=$peerEventEndpoint3
+#export PEEREVENTENDPOINT2=$PEEREVENTENDPOINT2
+#export PEEREVENTENDPOINT3=$peerEventEndpoint3
 
 echo Useful information stored in EXPORT variables
 echo REGION: $REGION
@@ -70,17 +70,17 @@ echo ORDERINGSERVICEENDPOINTNOPORT: $ORDERINGSERVICEENDPOINTNOPORT
 echo VPCENDPOINTSERVICENAME: $VPCENDPOINTSERVICENAME
 echo CASERVICEENDPOINT: $CASERVICEENDPOINT
 echo PEERNODEID1: $PEERNODEID1
-echo PEERNODEID2: $PEERNODEID2
-echo PEERNODEID3: $PEERNODEID3
+#echo PEERNODEID2: $PEERNODEID2
+#echo PEERNODEID3: $PEERNODEID3
 echo PEERSERVICEENDPOINT1: $PEERSERVICEENDPOINT1
-echo PEERSERVICEENDPOINT2: $PEERSERVICEENDPOINT2
-echo PEERSERVICEENDPOINT3: $PEERSERVICEENDPOINT3
+#echo PEERSERVICEENDPOINT2: $PEERSERVICEENDPOINT2
+#echo PEERSERVICEENDPOINT3: $PEERSERVICEENDPOINT3
 echo PEERSERVICEENDPOINTNOPORT1: $PEERSERVICEENDPOINTNOPORT1
-echo PEERSERVICEENDPOINTNOPORT2: $PEERSERVICEENDPOINTNOPORT2
-echo PEERSERVICEENDPOINTNOPORT3: $PEERSERVICEENDPOINTNOPORT3
+#echo PEERSERVICEENDPOINTNOPORT2: $PEERSERVICEENDPOINTNOPORT2
+#echo PEERSERVICEENDPOINTNOPORT3: $PEERSERVICEENDPOINTNOPORT3
 echo PEEREVENTENDPOINT1: $PEEREVENTENDPOINT1
-echo PEEREVENTENDPOINT2: $PEEREVENTENDPOINT2
-echo PEEREVENTENDPOINT3: $PEEREVENTENDPOINT3
+#echo PEEREVENTENDPOINT2: $PEEREVENTENDPOINT2
+#echo PEEREVENTENDPOINT3: $PEEREVENTENDPOINT3
 
 # Exports to be exported before executing any Fabric 'peer' commands via the CLI
 cat << EOF > peer-exports.sh
@@ -88,8 +88,8 @@ export MSP_PATH=/opt/home/admin-msp
 export MSP=$MEMBERID
 export ORDERER=$ORDERINGSERVICEENDPOINT
 export PEER1=$PEERSERVICEENDPOINT1
-export PEER2=$PEERSERVICEENDPOINT2
-export PEER3=$PEERSERVICEENDPOINT3
+#export PEER2=$PEERSERVICEENDPOINT2
+#export PEER3=$PEERSERVICEENDPOINT3
 export CHANNEL=mychannel
 export CAFILE=/opt/home/managedblockchain-tls-chain.pem
 export CHAINCODENAME=mycc
